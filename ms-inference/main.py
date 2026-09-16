@@ -11,9 +11,9 @@ MODEL_PATH = "model/best.pt"
 
 try:
     model = YOLO(MODEL_PATH)
-    print(f"Modelo cargado exitosamente desde {MODEL_PATH}")
+    print(f"Model successfully loaded from {MODEL_PATH}")
 except Exception as e:
-    print(f"Error al cargar el modelo: {e}")
+    print(f"Error loading model: {e}")
     model = None
 
 
@@ -25,17 +25,17 @@ def read_root():
 @app.websocket("/ws/predict")
 async def websocket_endpoint(websocket: WebSocket):
     """
-    Endpoint de WebSocket que:
-    1. Acepta la conexión.
-    2. Recibe frames continuos en formato binario (bytes de JPEG/PNG).
-    3. Ejecuta la inferencia con YOLOv8.
-    4. Envía de regreso un JSON con las detecciones para cada frame.
+    WebSocket endpoint that:
+    1. Accepts the connection.
+    2. Receives continuous frames in binary format (JPEG/PNG bytes).
+    3. Runs inference with YOLOv8.
+    4. Sends back a JSON response with detections for each frame.
     """
     await websocket.accept()
-    print("Client conected by websockets")
+    print("Client connected to WebSocket")
 
     if model is None:
-        await websocket.send_json({"error": "Modelo no disponible en el servidor."})
+        await websocket.send_json({"error": "Model not available on the server."})
         await websocket.close()
         return
 
@@ -48,7 +48,7 @@ async def websocket_endpoint(websocket: WebSocket):
             frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
             if frame is None:
-                await websocket.send_json({"error": "Frame inválido o dañado."})
+                await websocket.send_json({"error": "Invalid or corrupted frame."})
                 continue
 
             
